@@ -367,8 +367,6 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
     images_path.chop(4);
         // e.g. images_path: E:/.../my_vid
     images_path.insert(images_path.lastIndexOf('/'), "/frames/");
-    // auto xx = QString(images_path);
-    // xx.insert(images_path.lastIndexOf('/'), "/frames/");
         // e.g. images_path: E:/.../frames/my_vid
 
     // read duration seconds
