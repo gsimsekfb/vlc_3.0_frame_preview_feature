@@ -179,8 +179,6 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
 
 SeekSlider::~SeekSlider()
 {
-    // delete _frame; // todo
-
     delete chapters;
     if ( alternativeStyle )
         delete alternativeStyle;
@@ -356,26 +354,22 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
 void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
+    //// ggg patch - start
     _frame->setWindowFlags(Qt::Window);
-    int x = event->x();
-    int margin = handleLength();
-    int l = rect().left();
-    int r = rect().right();
-    int w = size().width();
-    // if(x < w/2)
-    //     _frame->setPixmap(QPixmap("cat.jpg", 0, Qt::AutoColor));
-    // else 
-    //     _frame->setPixmap(QPixmap("dog.jpg", 0, Qt::AutoColor));
+    int mouse_x_pos = event->x();
 
     // get file path
     RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
     QStringList recentList = rmrl->recentList();
-    QString cur_file = recentList.at(0);
-        // e.g. file:///E:/Vuze_/.../my_vid.mp4
-    QString images_path = cur_file.remove(0, 8);
+    QString current_file = recentList.at(0);
+        // e.g. file:///E:/.../my_vid.mp4
+    QString images_path = current_file.remove(0, 8);
     images_path.chop(4);
-        // e.g. E:/Vuze_/.../my_vid
-    // _frame->setWindowTitle("cur_file: " + cur_file);
+        // e.g. images_path: E:/.../my_vid
+    images_path.insert(images_path.lastIndexOf('/'), "/frames/");
+    // auto xx = QString(images_path);
+    // xx.insert(images_path.lastIndexOf('/'), "/frames/");
+        // e.g. images_path: E:/.../frames/my_vid
 
     // read duration seconds
     QFile file(images_path + "/dur.txt");
@@ -387,57 +381,41 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 
     // calculate image index
     int const N = 1; // index every N seconds 
-    QString index = QString::number( (x * dur) / w / N);
+    int width = size().width();
+    QString index = QString::number( (mouse_x_pos * dur) / width / N);
     QString image = "f_" + index + ".jpg"; 
 
-    // 
+    // set frame image
     _frame->setPixmap(QPixmap(images_path + "/" + image));
-    // _frame->setPixmap(QPixmap(images_path + "/" + image).scaledToWidth(400));
-    // _frame->resize(400, _frame->height());
-    // _frame->setFixedWidth(400);
+    int margin = handleLength();
     int posX = qMax(rect().left() + margin, qMin(rect().right() - margin, event->x()));
     QPoint point( 
         event->globalX() - ( event->x() - posX ),
         QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() 
     );
-    QPoint pos = _frame->pos();
-    int px = point.x();
-    int py = point.y();
-    int posx = pos.x();
-    int posy = pos.y();
-
+    // set position
     int adjust_x = 0;
-    if(x < 100) adjust_x = 100-x;
-    // else if(x > 1160) adjust_x = -(x*150/w);
-    // else if(x > 1160) adjust_x = w-x-150;
-    else if(x > 1160) adjust_x = 1160-x;
-
-    // w-x - 150 
-    // e.g. ilk sagdan tastigi an: x: 1160, w: 1266
-    // e.g. ekranin en sonunda:    x: 1254, w: 1266
-
+    if(mouse_x_pos < 100) adjust_x = 100-mouse_x_pos;
+    else if(mouse_x_pos > 1160) adjust_x = 1160-mouse_x_pos;
+        // e.g. ilk soldan tastigi an: mouse_x_pos:  150, width: 1266
+        // e.g. ilk sagdan tastigi an: mouse_x_pos: 1160, width: 1266
+        // e.g. ekranin en sonunda:    mouse_x_pos: 1254, width: 1266
     point.setY(point.y() - 300);
     point.setX(point.x() - 150 + adjust_x);
     _frame->move(point);
-    
-    int posx2 = pos.x();
-    int posy2 = pos.y();
-    
-    _frame->setWindowTitle(
-        + "index: " + index
-        + ", dur: " + QString::number(dur)
-        + ", x: " + QString::number(x)
-        + ", px: " + QString::number(px)
-        + ", py: " + QString::number(py)        
-        + ", posx: " + QString::number(posx)
-        + ", posy: " + QString::number(posy)
-        + ", posx2: " + QString::number(posx2)
-        + ", posy2: " + QString::number(posy2)        
-        + ", w: " + QString::number(size().width())
-        + ", m: " + QString::number(margin)
-        + ", images_path: " + images_path
-    );    
+
+    // for debugging
+    // _frame->setWindowTitle(
+    //     + "index: " + index
+    //     + ", dur: " + QString::number(dur)
+    //     + ", mouse_x_pos: " + QString::number(mouse_x_pos)
+    //     + ", width: " + QString::number(size().width())
+    //     // + ", xx: " + xx
+    //     + ", images_path: " + images_path
+    // );
+
     _frame->show();
+    //// ggg patch - end
 
 
     if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MidButton ) ) )
@@ -506,11 +484,6 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 
 void SeekSlider::enterEvent( QEvent * )
 {
-    // _frame->setWindowFlags(Qt::Window);
-    // _frame->setPixmap(QPixmap("E:\\cat.jpg", 0, Qt::AutoColor));
-    // _frame->setWindowTitle("cat-1");
-    // _frame->show();
-
     /* Cancel the fade-out timer */
     hideHandleTimer->stop();
     /* Only start the fade-in if needed */

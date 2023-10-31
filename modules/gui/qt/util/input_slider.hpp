@@ -119,8 +119,7 @@ private:
     QTimer *hideHandleTimer;
     QTimer *startAnimLoadingTimer;
 
-    QLabel *_frame;
-
+    QLabel *_frame; // ggg
 
 public slots:
     void setPosition( float, int64_t, int );
