@@ -35,6 +35,8 @@
 #include "input_manager.hpp"
 #include "imagehelper.hpp"
 
+#include "../recents.hpp" //
+
 #include <QPaintEvent>
 #include <QPainter>
 #include <QBitmap>
@@ -52,6 +54,8 @@
 #include <QDebug>
 #include <QScreen>
 #include <QSequentialAnimationGroup>
+
+#include <QLabel>
 
 namespace {
     int const MIN_SLIDER_VALUE = 0;
@@ -159,6 +163,8 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
     hideHandleTimer->setSingleShot( true );
     hideHandleTimer->setInterval( FADEOUT_DELAY );
 
+    _frame = new QLabel(this);
+
     startAnimLoadingTimer = new QTimer( this );
     startAnimLoadingTimer->setSingleShot( true );
     startAnimLoadingTimer->setInterval( 500 );
@@ -173,6 +179,8 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
 
 SeekSlider::~SeekSlider()
 {
+    // delete _frame; // todo
+
     delete chapters;
     if ( alternativeStyle )
         delete alternativeStyle;
@@ -348,6 +356,90 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
 void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
+    _frame->setWindowFlags(Qt::Window);
+    int x = event->x();
+    int margin = handleLength();
+    int l = rect().left();
+    int r = rect().right();
+    int w = size().width();
+    // if(x < w/2)
+    //     _frame->setPixmap(QPixmap("cat.jpg", 0, Qt::AutoColor));
+    // else 
+    //     _frame->setPixmap(QPixmap("dog.jpg", 0, Qt::AutoColor));
+
+    // get file path
+    RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
+    QStringList recentList = rmrl->recentList();
+    QString cur_file = recentList.at(0);
+        // e.g. file:///E:/Vuze_/.../my_vid.mp4
+    QString images_path = cur_file.remove(0, 8);
+    images_path.chop(4);
+        // e.g. E:/Vuze_/.../my_vid
+    // _frame->setWindowTitle("cur_file: " + cur_file);
+
+    // read duration seconds
+    QFile file(images_path + "/dur.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+    QTextStream in(&file);
+    QString line = in.readLine();
+    int dur = line.toFloat(); // duration seconds
+
+    // calculate image index
+    int const N = 1; // index every N seconds 
+    QString index = QString::number( (x * dur) / w / N);
+    QString image = "f_" + index + ".jpg"; 
+
+    // 
+    _frame->setPixmap(QPixmap(images_path + "/" + image));
+    // _frame->setPixmap(QPixmap(images_path + "/" + image).scaledToWidth(400));
+    // _frame->resize(400, _frame->height());
+    // _frame->setFixedWidth(400);
+    int posX = qMax(rect().left() + margin, qMin(rect().right() - margin, event->x()));
+    QPoint point( 
+        event->globalX() - ( event->x() - posX ),
+        QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() 
+    );
+    QPoint pos = _frame->pos();
+    int px = point.x();
+    int py = point.y();
+    int posx = pos.x();
+    int posy = pos.y();
+
+    int adjust_x = 0;
+    if(x < 100) adjust_x = 100-x;
+    // else if(x > 1160) adjust_x = -(x*150/w);
+    // else if(x > 1160) adjust_x = w-x-150;
+    else if(x > 1160) adjust_x = 1160-x;
+
+    // w-x - 150 
+    // e.g. ilk sagdan tastigi an: x: 1160, w: 1266
+    // e.g. ekranin en sonunda:    x: 1254, w: 1266
+
+    point.setY(point.y() - 300);
+    point.setX(point.x() - 150 + adjust_x);
+    _frame->move(point);
+    
+    int posx2 = pos.x();
+    int posy2 = pos.y();
+    
+    _frame->setWindowTitle(
+        + "index: " + index
+        + ", dur: " + QString::number(dur)
+        + ", x: " + QString::number(x)
+        + ", px: " + QString::number(px)
+        + ", py: " + QString::number(py)        
+        + ", posx: " + QString::number(posx)
+        + ", posy: " + QString::number(posy)
+        + ", posx2: " + QString::number(posx2)
+        + ", posy2: " + QString::number(posy2)        
+        + ", w: " + QString::number(size().width())
+        + ", m: " + QString::number(margin)
+        + ", images_path: " + images_path
+    );    
+    _frame->show();
+
+
     if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MidButton ) ) )
     {
         /* Handle button release when mouserelease has been hijacked by popup */
@@ -387,7 +479,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
         }
 
         QPoint target( event->globalX() - ( event->x() - posX ),
-                QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() );
+                QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() + 10);
         if( likely( size().width() > handleLength() ) ) {
             secstotimestr( psz_length, getValuePercentageFromXPos( event->x() ) * inputLength );
             mTimeTooltip->setTip( target, psz_length, chapterLabel );
@@ -414,6 +506,11 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
 
 void SeekSlider::enterEvent( QEvent * )
 {
+    // _frame->setWindowFlags(Qt::Window);
+    // _frame->setPixmap(QPixmap("E:\\cat.jpg", 0, Qt::AutoColor));
+    // _frame->setWindowTitle("cat-1");
+    // _frame->show();
+
     /* Cancel the fade-out timer */
     hideHandleTimer->stop();
     /* Only start the fade-in if needed */
@@ -432,6 +529,8 @@ void SeekSlider::enterEvent( QEvent * )
 
 void SeekSlider::leaveEvent( QEvent * )
 {
+    _frame->hide(); // ggg
+
     hideHandleTimer->start();
     /* Hide the tooltip
        - if the mouse leave the slider rect (Note: it can still be

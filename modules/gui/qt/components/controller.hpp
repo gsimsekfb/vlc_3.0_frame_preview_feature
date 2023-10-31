@@ -40,7 +40,7 @@
 #define INPT_TB_DEFAULT "43;33-4;44"
 #define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;25;35-4;34"
 
-#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
+#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium ---")
 
 class QBoxLayout;
 class QHBoxLayout;
@@ -113,7 +113,7 @@ static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"
     N_("Open subtitles"), N_("Dock fullscreen controller")
 };
 static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
-    N_("Stop playback"), N_("Open a medium"),
+    N_("Stop playbackkkk"), N_("Open a medium"),
     N_("Previous media in the playlist, skip backward when held"),
     N_("Next media in the playlist, skip forward when held"), N_("Slower"), N_("Faster"),
     N_("Toggle the video in fullscreen"), N_("Toggle the video out fullscreen"),

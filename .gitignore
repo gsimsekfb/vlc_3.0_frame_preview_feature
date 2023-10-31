@@ -53,3 +53,4 @@ build*
 contrib-*
 install-*
 
+win64

@@ -1,0 +1,177 @@
+diff --git a/.gitignore b/.gitignore
+index 0b0ee9cc20..a4faf44b10 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -53,3 +53,4 @@ build*
+ contrib-*
+ install-*
+ 
++win64
+\ No newline at end of file
+diff --git a/extras/package/win32/configure.sh b/extras/package/win32/configure.sh
+index 455ff18dd3..8de414ccca 100755
+--- a/extras/package/win32/configure.sh
++++ b/extras/package/win32/configure.sh
+@@ -20,4 +20,6 @@ OPTIONS="
+       --enable-zvbi --disable-telx
+       --enable-nls"
+ 
++# OPTIONS=""
++
+ sh "$(dirname $0)"/../../../configure ${OPTIONS}  "$@"
+diff --git a/modules/gui/qt/components/controller.hpp b/modules/gui/qt/components/controller.hpp
+index 25d4f4b00c..34c1bb0933 100644
+--- a/modules/gui/qt/components/controller.hpp
++++ b/modules/gui/qt/components/controller.hpp
+@@ -40,7 +40,7 @@
+ #define INPT_TB_DEFAULT "43;33-4;44"
+ #define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;25;35-4;34"
+ 
+-#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
++#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium ---")
+ 
+ class QBoxLayout;
+ class QHBoxLayout;
+@@ -113,7 +113,7 @@ static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"
+     N_("Open subtitles"), N_("Dock fullscreen controller")
+ };
+ static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
+-    N_("Stop playback"), N_("Open a medium"),
++    N_("Stop playbackkkk"), N_("Open a medium"),
+     N_("Previous media in the playlist, skip backward when held"),
+     N_("Next media in the playlist, skip forward when held"), N_("Slower"), N_("Faster"),
+     N_("Toggle the video in fullscreen"), N_("Toggle the video out fullscreen"),
+diff --git a/modules/gui/qt/components/controller_widget.cpp b/modules/gui/qt/components/controller_widget.cpp
+index 45ce4219fc..7cc47f36b9 100644
+--- a/modules/gui/qt/components/controller_widget.cpp
++++ b/modules/gui/qt/components/controller_widget.cpp
+@@ -138,7 +138,7 @@ void SoundWidget::refreshLabels()
+     }
+ 
+     if( i_sliderVolume < VOLUME_MAX / 3 )
+-        psz_icon = ":/toolbar/volume-low.svg";
++        psz_icon = ":/toolbar/volume-high.svg"; // ---
+     else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
+         psz_icon = ":/toolbar/volume-high.svg";
+     else
+@@ -230,9 +230,10 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
+  **/
+ void PlayButton::updateButtonIcons( bool b_playing )
+ {
+-    setIcon( b_playing ? QIcon( ":/toolbar/pause_b.svg" ) : QIcon( ":/toolbar/play_b.svg" ) );
+-    setToolTip( b_playing ? qtr( "Pause the playback" )
+-                          : qtr( I_PLAY_TOOLTIP ) );
++    setIcon(QIcon(QPixmap("cat.jpg")));
++    // setIcon( b_playing ? QIcon( ":/toolbar/pause_b.svg" ) : QIcon( ":/toolbar/play_b.svg" ) );
++    // setToolTip( b_playing ? qtr( "Pause the playback" )
++    //                       : qtr( I_PLAY_TOOLTIP ) );
+ }
+ 
+ void AtoB_Button::updateButtonIcons( bool timeA, bool timeB )
+diff --git a/modules/gui/qt/components/interface_widgets.cpp b/modules/gui/qt/components/interface_widgets.cpp
+index ff44bf2e44..a0bb4a2996 100644
+--- a/modules/gui/qt/components/interface_widgets.cpp
++++ b/modules/gui/qt/components/interface_widgets.cpp
+@@ -405,7 +405,8 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
+     setPalette( plt );
+ 
+     /* Init the cone art */
+-    updateDefaultArt( ":/logo/vlc128.png" );
++    // updateDefaultArt( ":/logo/vlc128.png" );
++    updateDefaultArt( "cat.jpg" );
+     updateArt( "" );
+ 
+     /* fade in animator */
+diff --git a/modules/gui/qt/util/input_slider.cpp b/modules/gui/qt/util/input_slider.cpp
+index 54b476d7b4..5cb90a0ca8 100644
+--- a/modules/gui/qt/util/input_slider.cpp
++++ b/modules/gui/qt/util/input_slider.cpp
+@@ -53,6 +53,8 @@
+ #include <QScreen>
+ #include <QSequentialAnimationGroup>
+ 
++#include <QLabel>
++
+ namespace {
+     int const MIN_SLIDER_VALUE = 0;
+     int const MAX_SLIDER_VALUE = 10000;
+@@ -159,6 +161,8 @@ SeekSlider::SeekSlider( intf_thread_t *p_intf, Qt::Orientation q, QWidget *_pare
+     hideHandleTimer->setSingleShot( true );
+     hideHandleTimer->setInterval( FADEOUT_DELAY );
+ 
++    _frame = new QLabel(this);
++
+     startAnimLoadingTimer = new QTimer( this );
+     startAnimLoadingTimer->setSingleShot( true );
+     startAnimLoadingTimer->setInterval( 500 );
+@@ -348,6 +352,26 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
+ 
+ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
+ {
++    _frame->setWindowFlags(Qt::Window);
++    int x = event->x();
++    int margin = handleLength();
++    int l = rect().left();
++    int r = rect().right();
++
++    int w = size().width();
++    if(x < w/2)
++        _frame->setPixmap(QPixmap("cat.jpg", 0, Qt::AutoColor));
++    else 
++        _frame->setPixmap(QPixmap("dog.jpg", 0, Qt::AutoColor));
++
++    _frame->setWindowTitle("x: " + QString::number(x) 
++        + ", m: " + QString::number(margin)
++        + ", l: " + QString::number(l)
++        + ", r: " + QString::number(r)
++        + ", w: " + QString::number(size().width())        
++    );
++    _frame->show();
++
+     if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MidButton ) ) )
+     {
+         /* Handle button release when mouserelease has been hijacked by popup */
+@@ -414,6 +438,11 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
+ 
+ void SeekSlider::enterEvent( QEvent * )
+ {
++    // _frame->setWindowFlags(Qt::Window);
++    // _frame->setPixmap(QPixmap("E:\\cat.jpg", 0, Qt::AutoColor));
++    // _frame->setWindowTitle("cat-1");
++    // _frame->show();
++
+     /* Cancel the fade-out timer */
+     hideHandleTimer->stop();
+     /* Only start the fade-in if needed */
+@@ -432,6 +461,8 @@ void SeekSlider::enterEvent( QEvent * )
+ 
+ void SeekSlider::leaveEvent( QEvent * )
+ {
++    // _frame->hide();
++
+     hideHandleTimer->start();
+     /* Hide the tooltip
+        - if the mouse leave the slider rect (Note: it can still be
+diff --git a/modules/gui/qt/util/input_slider.hpp b/modules/gui/qt/util/input_slider.hpp
+index aad65ce4d4..2dae714a8c 100644
+--- a/modules/gui/qt/util/input_slider.hpp
++++ b/modules/gui/qt/util/input_slider.hpp
+@@ -48,6 +48,8 @@ class QCommonStyle;
+ class TimeTooltip;
+ class QSequentialAnimationGroup;
+ 
++class QLabel;
++
+ /* Input Slider derived from QSlider */
+ class SeekSlider : public QSlider
+ {
+@@ -117,6 +119,9 @@ private:
+     QTimer *hideHandleTimer;
+     QTimer *startAnimLoadingTimer;
+ 
++    QLabel *_frame;
++
++
+ public slots:
+     void setPosition( float, int64_t, int );
+     void setSeekable( bool b ) { b_seekable = b ; }

@@ -48,6 +48,8 @@ class QCommonStyle;
 class TimeTooltip;
 class QSequentialAnimationGroup;
 
+class QLabel;
+
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider
 {
@@ -116,6 +118,9 @@ private:
     QSequentialAnimationGroup *animLoading;
     QTimer *hideHandleTimer;
     QTimer *startAnimLoadingTimer;
+
+    QLabel *_frame;
+
 
 public slots:
     void setPosition( float, int64_t, int );
