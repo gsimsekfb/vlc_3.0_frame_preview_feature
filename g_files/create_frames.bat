@@ -2,11 +2,11 @@
 echo "Hint: set root in line 5"
 echo "Hint: usage: create_frames.bat <name of mp4 file w/o extension>"
 echo started...
-set root_dir=E:\Vuze_\test\
+set root_dir=E:\videos\
 set name=%1.mp4
 set file=%root_dir%\%name%
 set images_dir=%root_dir%\frames\%1
-   @REM e.g. images_dir = E:\Vuze_\test\frames\gorit
+   @REM e.g. images_dir = E:\videos\frames\wildlife
 @REM create dir
 if not exist "%images_dir%" mkdir %images_dir%
 @REM echo %images_dir%
