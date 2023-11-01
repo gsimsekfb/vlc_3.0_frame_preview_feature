@@ -3,14 +3,17 @@
 
 ## Usage  
 
-Use [g_files\create_frames.bat](g_files) to create frames. 
+Use [g_files/create_frames.bat](g_files) to create frames. 
 Frames will be created at `frames` folder at the video file path.
 
 e.g.  
 ```
-// Create frames  
-create_frames.bat godfather  
+// Create frames for wildlife.mp4
+create_frames.bat wildlife  
 ```
+
+![Screenshot](g_files/frame_example.jpg)  
+
 
 ## Build 
 Source: https://medium.com/@tobias.strg/compiling-vlc-3-x-in-2020-a390c6a73c24     
