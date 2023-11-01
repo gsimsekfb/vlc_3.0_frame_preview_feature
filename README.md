@@ -58,24 +58,28 @@ Other steps which I did not have to do:
 # mkdir -p ~/'.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin'
 # unzip -d ~/'.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin' wix311-binaries.zip
 ```
+   
+<br /><br /><br />  
+    
+//////////////////////////////// Orig README   
+  
+<br /><br /><br />
+   
+```
 
+README for the VLC media player  
+===============================  
 
-
-//////////////////////////////// Orig README
-
-README for the VLC media player
-===============================
-
-VLC is a popular libre and open source media player and multimedia engine,
-used by a large number of individuals, professionals, companies and
-institutions. Using open source technologies and libraries, VLC has been
-ported to most computing platforms, including GNU/Linux, Windows, Mac OS X,
-BSD, iOS and Android.
-VLC can play most multimedia files, discs, streams, allows playback from
-devices, and is able to convert to or stream in various formats.
-The VideoLAN project was started at the university École Centrale Paris who
-relicensed VLC under the GPLv2 license in February 2001. Since then, VLC has
-been downloaded close to one billion times.
+VLC is a popular libre and open source media player and multimedia engine,  
+used by a large number of individuals, professionals, companies and  
+institutions. Using open source technologies and libraries, VLC has been  
+ported to most computing platforms, including GNU/Linux, Windows, Mac OS X,  
+BSD, iOS and Android.  
+VLC can play most multimedia files, discs, streams, allows playback from  
+devices, and is able to convert to or stream in various formats.  
+The VideoLAN project was started at the university École Centrale Paris who  
+relicensed VLC under the GPLv2 license in February 2001. Since then, VLC has  
+been downloaded close to one billion times.  
 
 Links:
 ======
@@ -120,3 +124,5 @@ po/                - VLC translations.
 share/             - Common Resources files.
 src/               - libvlccore source code.
 test/              - testing system.
+
+```
