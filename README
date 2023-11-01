@@ -1,3 +1,68 @@
+
+# vlc_frame_preview_feature  
+
+## Usage  
+
+```
+// Create frames  
+create_frames.bat godfather  
+
+```
+
+## Build 
+Source: https://medium.com/@tobias.strg/compiling-vlc-3-x-in-2020-a390c6a73c24     
+ 
+2. Start the docker instance, by running this command:    
+
+```
+$ cd ~
+$ mkdir win64 && cd win64
+$ git clone git://git.videolan.org/vlc/vlc-3.0.git
+$ docker run -v ~/win64:/win64 -i -t registry.videolan.org:5000/vlc-debian-win64 /bin/bash
+```
+
+3. At this point docker will download the image if it is not in your cache and you will be interacting with the instance once it returns. You should see something like  
+
+```  
+root@cf204d746bf1:/#  
+```  
+
+cd /win64/vlc-3.0/   
+and build:     
+```
+./extras/package/win32/build.sh -l -a x86_64 -i n
+```
+
+7. Once the process finishes, the Windows binary can be found in the folder /win64/vlc-3.0/win64/ on the docker instance, and likewise ~/win64/vlc-3.0/win64/ on the host instance  
+
+8. On host:  
+```
+sudo zip -r -l -q -f vlc.zip vlc-3.0.15  
+```   
+
+-------------------------  
+
+Other steps which I did not have to do:     
+
+```  
+4. Before we start building, we need to install a few dependencies that are left out (in spite of using a pre-made build instance):  
+# apt-get update && apt-get install -y python  
+  
+5. There are also some errors with WINE on the docker images, details can be found here (thanks to mmu_man for this excellent bug report). The commands that follow are directly taken from there:  
+
+# apt-get remove wine64
+# dpkg --add-architecture i386 && apt-get update && apt-get install wine32 winetricks
+# wget https://dl.winehq.org/wine/wine-mono/4.8.0/wine-mono-4.8.0.msi
+# wine msiexec /i wine-mono-4.8.0.msi
+# wget https://github.com/wixtoolset/wix3/releases/download/wix3111rtm/wix311-binaries.zip
+# mkdir -p ~/'.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin'
+# unzip -d ~/'.wine/dosdevices/c:/Program Files (x86)/Windows Installer XML v3.5/bin' wix311-binaries.zip
+```
+
+
+
+//////////////////////////////// Orig README
+
 README for the VLC media player
 ===============================
 
