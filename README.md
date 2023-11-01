@@ -3,15 +3,17 @@
 
 ## Usage  
 
-Use [g_files/create_frames.bat](g_files) to create frames. 
-Frames will be created at `frames` folder at the video file path.
+Use [g_files/create_frames.bat](g_files) to create frames.  
+This script assumes ffmpeg installed and added into path or run this script in the path of ffmpeg.exe.  
+ 
 
 e.g.  
+1. Set `root_dir=E:\videos\` manually in `create_frames.bat`  
+2. Create frames for `E:\videos\wildlife.mp4`  
 ```
-// Create frames for wildlife.mp4
+// Frames dir will be: E:\videos\frames\wildlife
 create_frames.bat wildlife  
-```
-
+```  
 
 <img src="g_files/frame_example.jpg" width="450">
 
