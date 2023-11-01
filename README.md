@@ -12,7 +12,8 @@ e.g.
 create_frames.bat wildlife  
 ```
 
-![Screenshot](g_files/frame_example.jpg)  
+
+<img src="g_files/frame_example.jpg" width="450">
 
 
 ## Build 
