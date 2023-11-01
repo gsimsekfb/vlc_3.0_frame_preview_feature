@@ -4,12 +4,12 @@
 ## Usage  
 
 Use [g_files\create_frames.bat](g_files) to create frames. 
-Frames will 
+Frames will be created at `frames` folder at the video file path.
 
+e.g.  
 ```
 // Create frames  
 create_frames.bat godfather  
-
 ```
 
 ## Build 
