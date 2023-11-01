@@ -3,6 +3,9 @@
 
 ## Usage  
 
+Use [g_files\create_frames.bat](g_files) to create frames. 
+Frames will 
+
 ```
 // Create frames  
 create_frames.bat godfather  
