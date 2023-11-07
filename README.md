@@ -1,6 +1,10 @@
 
 # vlc_frame_preview_feature  
 
+## Info  
+This repo is the first version of my simple and quick patch for VLC 3.0 frame preview feature.  
+Frame preview feature does not exist for any of official VLC versions.  
+
 ## Usage  
 
 Use [g_files/create_frames.bat](g_files) to create frames.  
